@@ -1,0 +1,7 @@
+{
+  "roles": {
+    "manager": [ "deletetask", "viewalltasks","create_task"],
+    "team_lead": ["viewalltask","create_task"],
+    "employee": ["viewtask","create_task"]
+  }
+}

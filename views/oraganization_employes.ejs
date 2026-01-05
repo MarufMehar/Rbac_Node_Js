@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Dashboard + Lead Form</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 950px;
+            margin: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .task-box {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 5px solid #007bff;
+            border-radius: 6px;
+        }
+
+        .btn {
+            padding: 7px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        .btn-create {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-update {
+            background: #ffc107;
+            color: black;
+        }
+
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .lead-form {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .submit-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+
+    <script>
+        function toggleLeadForm() {
+            const form = document.getElementById('leadForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Welcome, <%= role.toUpperCase() %> 👋</h1>
+
+    <h2>Leads</h2>
+
+    <% if (!leads || leads.length === 0) { %>
+        <p>No Leads available</p>
+    <% } %>
+
+    <% leads.forEach(lead => { %>
+        <div class="task-box">
+
+            <strong>Phone: <%= lead.phone_number %></strong><br>
+            <small>Duration: <%= lead.duration %></small><br>
+            <small>Status: <%= lead.call_status %></small><br>
+            <small>Tags: <%= lead.tags %></small><br>
+            <small>Remarks: <%= lead.remarks %></small><br>
+            <small>Call Type: <%= lead.call_type %></small><br>
+            <small>Opportunities: <%= lead.opportunities %></small>
+            <br><br>
+
+            <!-- DELETE BUTTON (Only Manager) -->
+            <form action="/leads/delete/<%= lead.row_id %>" method="POST" style="display:inline;">
+                <button 
+                    class="btn btn-delete <%= role !== 'manager' ? 'disabled' : '' %>"
+                    <%= role !== 'manager' ? 'disabled' : '' %>>
+                    Delete
+                </button>
+            </form>
+
+            <!-- UPDATE BUTTON (Manager only) -->
+            <form action="/leads/update/<%= lead.row_id %>" method="GET" style="display:inline;">
+                <button 
+                    class="btn btn-update <%= role !== 'manager' ? 'disabled' : '' %>"
+                    <%= role !== 'manager' ? 'disabled' : '' %>>
+                    Update
+                </button>
+            </form>
+
+        </div>
+    <% }) %>
+
+
+
+
+    <!-- LEAD FORM BUTTON -->
+    <button class="btn btn-create" onclick="toggleLeadForm()">Create Lead</button>
+
+    <!-- LEAD CREATION FORM (toggle) -->
+    <div id="leadForm" class="lead-form">
+
+        <h2>Create Lead</h2>
+
+        <form action="/leads/create" method="POST">
+
+            <input type="hidden" name="organization_id" value="<%= organizationId %>">
+            <input type="hidden" name="employe_id" value="<%= employe_id %>">
+
+            <label>Phone Number</label>
+            <input type="text" name="phone_number" required>
+
+            <label>Duration</label>
+            <input type="text" name="duration" required placeholder="Eg: 3 min 40 sec">
+
+            <label>Call Status</label>
+            <select name="call_status">
+                <option value="unknown">Unknown</option>
+                <option value="completed">Completed</option>
+                <option value="not_answered">Not Answered</option>
+                <option value="busy">Busy</option>
+            </select>
+
+            <label>Tags</label>
+            <input type="text" name="tags" placeholder="Eg: interested, follow_up">
+
+            <label>Remarks</label>
+            <textarea name="remarks" rows="3" placeholder="Enter remarks..."></textarea>
+
+            <label>Call Type</label>
+            <select name="call_type">
+                <option value="incoming">Incoming</option>
+                <option value="outgoing">Outgoing</option>
+            </select>
+
+            <label>Opportunities</label>
+            <input type="number" name="opportunities" required>
+
+            <button type="submit" class="submit-btn">Save Lead</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

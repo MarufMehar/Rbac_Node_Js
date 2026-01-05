@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Home</title>
+</head>
+<body>
+    <h1>Welcome, <%= role %></h1>
+
+    <h2>Your Tasks</h2>
+    <ul>
+        <% tasks.forEach(task => { %>
+            <li>
+                <%= task.title %>
+                
+                
+                <% if (role === 'admin') { %>
+                    <button <%= canDelete ? '' : 'disabled' %>>Delete</button>
+                <% } %>
+
+                
+                <% if (role === 'manager') { %>
+                    <button>Update</button>
+                <% } %>
+
+            </li>
+        <% }) %>
+    </ul>
+
+    
+<% if (canCreate) { %>
+    <form action="/tasks/create" method="POST" style="display:inline;">
+        <button type="submit">Create Task</button>
+    </form>
+<% } else { %>
+    <button disabled>Create Task</button>
+<% } %>
+
+</body>
+</html>

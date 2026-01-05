@@ -1,0 +1,265 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Owner Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2, h3 {
+            text-align: center;
+        }
+
+        .task-box {
+            background: #f8f8f8;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #007bff;
+            border-radius: 5px;
+        }
+
+        .no-task {
+            padding: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 18px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            margin: 15px 0;
+        }
+
+        .button:hover {
+            background: #1e7e34;
+        }
+
+        #employeeForm {
+            display: none;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .submit-btn {
+            background: #007bff;
+            padding: 10px;
+            border: none;
+            color: white;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #0056b3;
+        }
+
+        /* Employee Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #f1f1f1;
+            padding: 10px;
+        }
+
+        td {
+            padding: 8px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .update-btn {
+            background: #007bff;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+        }
+
+    </style>
+
+    <script>
+        function toggleForm() {
+            const form = document.getElementById('employeeForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Welcome, <%= ownerName %> 👋</h2>
+    <h3>Your Organization Leads</h3>
+
+    <!-- SHOW LEADS -->
+    <% if (leads && leads.length > 0) { %>
+
+        <% leads.forEach(lead => { %>
+            <div class="task-box">
+
+                <strong>Phone:</strong> <%= lead.phone_number %> <br>
+                <strong>Duration:</strong> <%= lead.duration %> <br>
+                <strong>Status:</strong> <%= lead.call_status %> <br>
+                <strong>Tags:</strong> <%= lead.tags %> <br>
+                <strong>Remarks:</strong> <%= lead.remarks %> <br>
+                <strong>Call Type:</strong> <%= lead.call_type %> <br>
+                <strong>Opportunities:</strong> <%= lead.opportunities %> <br>
+
+                <br>
+
+                <!-- DELETE LEAD -->
+                <form action="/leads/delete/<%= lead.row_id %>" method="POST" style="display:inline;">
+                    <button class="action-btn delete-btn">Delete</button>
+                </form>
+
+                <!-- UPDATE LEAD -->
+                <form action="/leads/update/<%= lead.row_id %>" method="GET" style="display:inline;">
+                    <button class="action-btn update-btn">Update</button>
+                </form>
+
+            </div>
+        <% }) %>
+
+    <% } else { %>
+
+        <div class="no-task">No Leads Found</div>
+
+    <% } %>
+
+
+    <!-- EMPLOYEE LIST -->
+    <h3>Organization Employees</h3>
+
+    <% if (employees && employees.length > 0) { %>
+
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+            </tr>
+
+            <% employees.forEach(emp => { %>
+            <tr>
+                <td><%= emp.username %></td>
+                <td><%= emp.phone_number %></td>
+                <td><%= emp.email %></td>
+                <td><%= emp.role %></td>
+                <td><%= emp.status ? "Active" : "Inactive" %></td>
+            </tr>
+            <% }) %>
+
+        </table>
+
+    <% } else { %>
+        <div class="no-task">No Employees Found</div>
+    <% } %>
+
+
+    <!-- BUTTON TO OPEN EMPLOYEE FORM -->
+    <button class="button" onclick="toggleForm()">Add Employee</button>
+
+
+    <!-- EMPLOYEE ADD FORM -->
+    <div id="employeeForm">
+
+        <% if (msg) { %>
+        <div style="background:#d4edda;color:#155724;padding:10px;border-radius:5px;margin-bottom:15px;">
+            <%= msg %>
+        </div>
+        <% } %>
+
+        <h3>Add New Employee</h3>
+
+        <form action="/employees/add" method="POST">
+
+            <input type="hidden" name="organization_id" value="<%= organizationId %>">
+
+            <label>Employee Username:</label>
+            <input type="text" name="username" required>
+
+            <label>Employee Phone Number:</label>
+            <input type="text" name="phone_number" required>
+
+            <label>Employee Email:</label>
+            <input type="email" name="email" required>
+
+            <label>Role:</label>
+            <select name="role" required>
+                <option value="">-- Select Role --</option>
+                <option value="manager">Manager</option>
+                <option value="team_lead">Team Lead</option>
+                <option value="employee">Employee</option>
+            </select>
+
+            <button class="submit-btn" type="submit">Add Employee</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
